@@ -1,0 +1,77 @@
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# next.js
+.next/
+node_modules/
+dist/
+out/
+
+# Node
+.env.local
+.env*
+
+#debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# dependencies
+/.pnp
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/versions
+
+# production
+/build
+
+# vercel
+.vercel
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
+
+
+# OS
+.DS_Store
+*.pem
+Thumbs.db
+
+# Editor/IDE
+.vscode/
+.idea/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.db
+*.sqlite3
+*.egg-info/
+*.egg
+*.env
+.venv/
+env/
+venv/
+Pipfile.lock
+
+# FastAPI
+app/__pycache__/
+app/static/
+
+# Mongo cache (if used locally)
+dump/
+
+# Logs
+*.log
+bun.lock
+
+
+
+
+
