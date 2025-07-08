@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 class Settings(BaseSettings):
-    MONGO_CONNECTION_STRING: str = os.getenv("MONGO_CONNECTION_STRING", "mongodb://localhost:27017")
+    MONGO_CONNECTION_STRING: str = os.getenv("MONGO_CONNECTION_STRING", "mongodb://localhost:27017") #Deployed || Locally
     MONGO_DB_NAME: str = os.getenv("MONGO_DB_NAME", "trendify")
     
     # Port configuration for deployment
@@ -15,7 +15,7 @@ class Settings(BaseSettings):
     
     # Configuration for CORS (Cross-Origin Resource Sharing)
     # In a production environment, you should restrict this to your frontend's domain
-    CLIENT_ORIGIN_URL: str = os.getenv("CLIENT_ORIGIN_URL", "https://trendify-frontend-five.vercel.app/")
+    CLIENT_ORIGIN_URL: str = os.getenv("CLIENT_ORIGIN_URL", "https://trendify-frontend-two.vercel.app/")
 
     class Config:
         env_file = ".env"
