@@ -10,7 +10,7 @@ class Category(BaseModel):
     imageUrl: str
     # No more productId! The frontend will handle the link.
 
-# This is now just a simple list of the categories we want to display.
+# This is a simple list of the categories we want to display.
 CATEGORIES_DATA = [
     {"name": "Dresses", "imageUrl": "/images/category-dresses.jpg"},
     {"name": "Tops", "imageUrl": "/images/category-tops.jpg"},

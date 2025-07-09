@@ -11,8 +11,8 @@ load_dotenv(dotenv_path=dotenv_path)
 MONGO_CONNECTION_STRING = os.getenv("MONGO_CONNECTION_STRING", "mongodb://localhost:27017")
 MONGO_DB_NAME = os.getenv("MONGO_DB_NAME", "trendify")
 
-# --- This is the corrected data block ---
-# The 'name' fields here are now guaranteed to match what categories.py is looking for.
+# Data to seed the database
+# The 'name' fields here should match with categories.py requirements.
 products_data = [
     {
         "name": "Summer Dress",
@@ -59,7 +59,7 @@ products_data = [
         "price": 899,
         "description": "Classic straight-leg jeans made from durable, high-quality denim.",
         "category": "Casual Wear",
-        "imageUrl": "/images/jeans.jpg", # You will need to add this image
+        "imageUrl": "/images/jeans.jpg",
         "sizes": ["28", "30", "32", "34", "36"]
     },
     {
@@ -67,7 +67,7 @@ products_data = [
         "price": 1500,
         "description": "A beautifully embroidered kurti, perfect for both casual and festive occasions.",
         "category": "Tops",
-        "imageUrl": "/images/kurti.jpg", # You will need to add this image
+        "imageUrl": "/images/kurti.jpg",
         "sizes": ["S", "M", "L", "XL"]
     },
     {
@@ -75,7 +75,7 @@ products_data = [
         "price": 1200,
         "description": "Stylish and comfortable leather shoes to complete any outfit.",
         "category": "Shoes",
-        "imageUrl": "/images/shoes.jpg", # You will need to add this image
+        "imageUrl": "/images/shoes.jpg",
         "sizes": ["5", "6", "7", "8", "9"]
     }
 ]

@@ -37,7 +37,7 @@ async def list_products():
 async def show_product(id: str):
     """
     Retrieve a single product by its unique ID.
-    
+    This endpoint returns the product details for the specified ID.
     The ID is the MongoDB document's `_id`.
     """
     if not ObjectId.is_valid(id):

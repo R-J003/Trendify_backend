@@ -3,7 +3,7 @@ import os
 from pydantic import BaseSettings
 from dotenv import load_dotenv
 
-# Load environment variables from a .env file
+# Loads environment variables from a .env file
 load_dotenv()
 
 class Settings(BaseSettings):
@@ -14,7 +14,7 @@ class Settings(BaseSettings):
     PORT: int = int(os.getenv("PORT", 8000))
     
     # Configuration for CORS (Cross-Origin Resource Sharing)
-    # In a production environment, you should restrict this to your frontend's domain
+    # In a production environment, it should be restrict to the frontend's domain
     CLIENT_ORIGIN_URL: str = os.getenv("CLIENT_ORIGIN_URL", "https://trendify-frontend-two.vercel.app/")
 
     class Config:

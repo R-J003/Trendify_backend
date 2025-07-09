@@ -7,7 +7,7 @@ from app.db.database import connect_to_mongo, close_mongo_connection
 # --- CHANGE HERE: Imported the new 'categories' router ---
 from app.api.v1.endpoints import products, categories
 
-# Create FastAPI app instance
+# FastAPI app instance
 app = FastAPI(
     title="Trendify API",
     description="API for the Trendify e-commerce application.",
@@ -21,7 +21,7 @@ app.add_event_handler("shutdown", close_mongo_connection)
 
 
 # --- Middleware ---
-# Set up CORS to allow requests from our frontend.
+# CORS Set up to allow requests from our frontend.
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],  # The origin of our Next.js app
@@ -31,14 +31,15 @@ app.add_middleware(
 )
 
 # --- API Routers ---
-# Include the products router with a prefix and tags for organization.
+# --- products router ---
+# Includes the products router with a prefix and tags for organization.
 app.include_router(
     products.router,
     prefix="/api/v1/products",
     tags=["Products"]
 )
 
-# --- CHANGE HERE: Add the new categories router ---
+# --- categories router ---
 app.include_router(
     categories.router,
     prefix="/api/v1/categories",
