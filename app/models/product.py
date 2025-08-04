@@ -1,6 +1,6 @@
 # backend/app/models/product.py
 from pydantic import BaseModel, Field
-from typing import List
+from typing import List, Optional
 from bson import ObjectId
 
 # Pydantic doesn't have a native ObjectId type, so we create a custom one.
@@ -49,3 +49,22 @@ class ProductModel(BaseModel):
 # This model can be used when returning data from the database
 class ProductInDB(ProductModel):
     pass
+
+# Model for creating a new product (ID is not required)
+class ProductCreateModel(BaseModel):
+    name: str = Field(...)
+    price: float = Field(..., gt=0)
+    description: str = Field(...)
+    category: str = Field(...)
+    imageUrl: str = Field(...)
+    sizes: List[str] = Field(...)
+
+
+# Model for updating a product (all fields are optional)
+class ProductUpdateModel(BaseModel):
+    name: Optional[str] = None
+    price: Optional[float] = Field(default=None, gt=0)
+    description: Optional[str] = None
+    category: Optional[str] = None
+    imageUrl: Optional[str] = None
+    sizes: Optional[List[str]] = None
