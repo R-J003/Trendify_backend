@@ -15,9 +15,7 @@ def get_product_collection():
 
 
 @router.get(
-    "",  # Correct: Path is exactly the prefix
-    response_description="List all products",
-    response_model=List[ProductInDB],
+    "", response_description="List all products", response_model=List[ProductInDB]
 )
 async def list_products():
     collection = get_product_collection()
@@ -40,18 +38,16 @@ async def show_product(id: str):
     return product
 
 
-# === THIS IS THE FIX ===
-# The path must be "" to match the URL /api/v1/products for POST requests.
 @router.post(
-    "",  # <-- FIX IS HERE
+    "",
     response_description="Add new product",
     response_model=ProductInDB,
     status_code=status.HTTP_201_CREATED,
 )
 async def create_product(product: ProductCreateModel):
     collection = get_product_collection()
-    # Pydantic v2 uses model_dump()
-    new_product = await collection.insert_one(product.model_dump())
+    # === THIS IS THE FIX: Use .dict() for Pydantic v1 ===
+    new_product = await collection.insert_one(product.dict())
     created_product = await collection.find_one({"_id": new_product.inserted_id})
     return created_product
 
@@ -63,8 +59,9 @@ async def update_product(id: str, product_update: ProductUpdateModel):
     if not ObjectId.is_valid(id):
         raise HTTPException(status_code=400, detail=f"{id} is not a valid ObjectId")
     collection = get_product_collection()
-    # Pydantic v1 uses model_dump() to get the data
-    update_data = product_update.dict(exclude_unset=True)
+    update_data = product_update.dict(
+        exclude_unset=True
+    )  # Pydantic v1 uses .dict() to get the data
 
     if len(update_data) >= 1:
         update_result = await collection.update_one(
