@@ -26,16 +26,24 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-# --- THIS IS THE DEFINITIVE FIX ---
-# This configuration tells the backend to accept requests from ANY origin.
+# --- THIS IS THE ROBUST FIX FOR CORS ---
+
+# Define a list of trusted origins.
+# It reads your local frontend URL from your .env file for local development.
+# For production, we will add the Vercel URL as an environment variable on Render.
+origins = [
+    settings.CLIENT_ORIGIN_URL,  # This will be http://localhost:3000 locally
+    "https://trendify-frontend-two.vercel.app",  # Your live Vercel frontend
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Allows all origins
+    allow_origins=origins,
     allow_credentials=True,
-    allow_methods=["*"],  # Allows all methods (GET, POST, PUT, DELETE, etc.)
-    allow_headers=["*"],  # Allows all headers
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
-# --------------------------------
+# ----------------------------------------
 
 # API Routers
 app.include_router(products.router, prefix="/api/v1/products", tags=["Products"])
