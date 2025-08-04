@@ -63,8 +63,8 @@ async def update_product(id: str, product_update: ProductUpdateModel):
     if not ObjectId.is_valid(id):
         raise HTTPException(status_code=400, detail=f"{id} is not a valid ObjectId")
     collection = get_product_collection()
-    # Pydantic v2 uses model_dump(exclude_unset=True) for updates
-    update_data = product_update.model_dump(exclude_unset=True)
+    # Pydantic v1 uses model_dump() to get the data
+    update_data = product_update.dict(exclude_unset=True)
 
     if len(update_data) >= 1:
         update_result = await collection.update_one(
