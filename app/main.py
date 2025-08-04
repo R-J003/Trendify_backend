@@ -26,15 +26,13 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-# --- THIS IS THE CRITICAL FIX ---
-# Configure CORS to allow all methods from the client's origin.
+# --- THIS IS THE DEFINITIVE FIX ---
+# This configuration tells the backend to accept requests from ANY origin.
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        settings.CLIENT_ORIGIN_URL
-    ],  # Reads "http://localhost:3000" from .env
+    allow_origins=["*"],  # Allows all origins
     allow_credentials=True,
-    allow_methods=["*"],  # <<< THIS ALLOWS GET, POST, PUT, DELETE, etc.
+    allow_methods=["*"],  # Allows all methods (GET, POST, PUT, DELETE, etc.)
     allow_headers=["*"],  # Allows all headers
 )
 # --------------------------------
