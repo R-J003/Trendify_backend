@@ -4,7 +4,6 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.core.config import settings
 from app.db.database import connect_to_mongo, close_mongo_connection
-# --- CHANGE HERE: Imported the new 'categories' router ---
 from app.api.v1.endpoints import products, categories
 
 # FastAPI app instance

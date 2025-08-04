@@ -1,6 +1,6 @@
 # backend/app/models/product.py
 from pydantic import BaseModel, Field
-from typing import List, Optional
+from typing import List
 from bson import ObjectId
 
 # Pydantic doesn't have a native ObjectId type, so we create a custom one.

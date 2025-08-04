@@ -5,7 +5,7 @@ from app.core.config import settings
 
 class Database:
     client: Optional[AsyncIOMotorClient] = None 
-    db: Optional[AsyncIOMotorDatabase] = None 
+    db: Optional[AsyncIOMotorDatabase] = None
 
 db_handler = Database()
 
