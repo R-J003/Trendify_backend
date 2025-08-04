@@ -1,5 +1,5 @@
 # backend/app/api/v1/endpoints/products.py
-from fastapi import (APIRouter, HTTPException, status, Response)
+from fastapi import APIRouter, HTTPException, status, Response
 from typing import List
 from bson import ObjectId
 
@@ -8,23 +8,20 @@ from app.models.product import ProductInDB, ProductCreateModel, ProductUpdateMod
 
 router = APIRouter()
 
-# Dependency to get the database collection
+
 def get_product_collection():
     db = get_database()
     return db.products
 
+
 @router.get(
-    "",
+    "",  # Correct: No trailing slash
     response_description="List all products",
     response_model=List[ProductInDB],
-    status_code=status.HTTP_200_OK
 )
 async def list_products():
-    """
-    Retrieve all products from the database.
-    """
     collection = get_product_collection()
-    products = await collection.find().to_list(100) # Limit to 100 products
+    products = await collection.find().to_list(100)
     return products
 
 
@@ -32,40 +29,29 @@ async def list_products():
     "/{id}",
     response_description="Get a single product by its ID",
     response_model=ProductInDB,
-    status_code=status.HTTP_200_OK
 )
 async def show_product(id: str):
-    """
-    Retrieve a single product by its unique ID.
-    This endpoint returns the product details for the specified ID.
-    The ID is the MongoDB document's `_id`.
-    """
     if not ObjectId.is_valid(id):
         raise HTTPException(status_code=400, detail=f"{id} is not a valid ObjectId")
-
     collection = get_product_collection()
     product = await collection.find_one({"_id": ObjectId(id)})
-
     if product is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Product with ID {id} not found"
-        )
+        raise HTTPException(status_code=404, detail=f"Product with ID {id} not found")
     return product
 
 
+# === THIS IS THE FIX ===
+# The path must be "" to match the URL /api/v1/products
 @router.post(
-    "/",
+    "",  # <-- FIX IS HERE
     response_description="Add new product",
     response_model=ProductInDB,
     status_code=status.HTTP_201_CREATED,
 )
 async def create_product(product: ProductCreateModel):
-    """
-    Create a new product.
-    """
     collection = get_product_collection()
-    new_product = await collection.insert_one(product.dict())
+    # Pydantic v2 uses model_dump() instead of dict()
+    new_product = await collection.insert_one(product.model_dump())
     created_product = await collection.find_one({"_id": new_product.inserted_id})
     return created_product
 
@@ -74,22 +60,16 @@ async def create_product(product: ProductCreateModel):
     "/{id}", response_description="Update a product", response_model=ProductInDB
 )
 async def update_product(id: str, product_update: ProductUpdateModel):
-    """
-    Update an existing product by its ID.
-    """
     if not ObjectId.is_valid(id):
         raise HTTPException(status_code=400, detail=f"{id} is not a valid ObjectId")
-
     collection = get_product_collection()
-
-    # Create a dict of fields to update, excluding any that are None
-    update_data = {k: v for k, v in product_update.dict().items() if v is not None}
+    # Use model_dump(exclude_unset=True) for updates in Pydantic v2
+    update_data = product_update.model_dump(exclude_unset=True)
 
     if len(update_data) >= 1:
         update_result = await collection.update_one(
             {"_id": ObjectId(id)}, {"$set": update_data}
         )
-
         if update_result.matched_count == 0:
             raise HTTPException(
                 status_code=404, detail=f"Product with ID {id} not found"
@@ -99,7 +79,6 @@ async def update_product(id: str, product_update: ProductUpdateModel):
         existing_product := await collection.find_one({"_id": ObjectId(id)})
     ) is not None:
         return existing_product
-
     raise HTTPException(status_code=404, detail=f"Product with ID {id} not found")
 
 
@@ -109,16 +88,10 @@ async def update_product(id: str, product_update: ProductUpdateModel):
     status_code=status.HTTP_204_NO_CONTENT,
 )
 async def delete_product(id: str):
-    """
-    Delete a product by its ID.
-    """
     if not ObjectId.is_valid(id):
         raise HTTPException(status_code=400, detail=f"{id} is not a valid ObjectId")
-
     collection = get_product_collection()
     delete_result = await collection.delete_one({"_id": ObjectId(id)})
-
     if delete_result.deleted_count == 0:
         raise HTTPException(status_code=404, detail=f"Product with ID {id} not found")
-
     return Response(status_code=status.HTTP_204_NO_CONTENT)

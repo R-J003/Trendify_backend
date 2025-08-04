@@ -1,56 +1,60 @@
 # backend/app/models/product.py
 from pydantic import BaseModel, Field
-from typing import List, Optional
+from typing import List, Any, Optional
 from bson import ObjectId
+from pydantic_core.core_schema import CoreSchema
 
-# Pydantic doesn't have a native ObjectId type, so we create a custom one.
-# This allows us to validate that a string is a valid ObjectId and
-# also helps with JSON serialization.
+
+# --- Custom Pydantic Type for MongoDB's ObjectId (Pydantic v2 compatible) ---
 class PyObjectId(ObjectId):
     @classmethod
-    def __get_validators__(cls):
-        yield cls.validate
+    def __get_pydantic_core_schema__(cls, source_type: Any, handler: Any) -> CoreSchema:
+        def validate_from_str(value: str) -> ObjectId:
+            if not ObjectId.is_valid(value):
+                raise ValueError("Invalid ObjectId")
+            return ObjectId(value)
 
-    @classmethod
-    def validate(cls, v):
-        if not ObjectId.is_valid(v):
-            raise ValueError("Invalid ObjectId")
-        return ObjectId(v)
+        return CoreSchema(
+            "union",
+            [
+                CoreSchema("is-instance", ObjectId),
+                CoreSchema("no-info-plain-validator", validate_from_str),
+            ],
+            serialization={"type": "to-string"},
+        )
 
-    @classmethod
-    def __modify_schema__(cls, field_schema):
-        field_schema.update(type="string")
 
-
+# --- Pydantic Model for a Product ---
 class ProductModel(BaseModel):
     id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
     name: str = Field(...)
-    price: float = Field(..., gt=0) # Price must be greater than 0
+    price: float = Field(..., gt=0)
     description: str = Field(...)
     category: str = Field(...)
     imageUrl: str = Field(...)
     sizes: List[str] = Field(...)
 
     class Config:
-        allow_population_by_field_name = True
-        arbitrary_types_allowed = True
+        populate_by_name = True
         json_encoders = {ObjectId: str}
-        schema_extra = {
+        json_schema_extra = {
             "example": {
                 "name": "Summer Dress",
                 "price": 49.99,
                 "description": "This elegant summer dress is perfect for sunny days.",
-                "category": "Perfect for sunny days",
+                "category": "Dresses",
                 "imageUrl": "/images/summer-dress.png",
-                "sizes": ["S", "M", "L", "XL"]
+                "sizes": ["S", "M", "L", "XL"],
             }
         }
 
-# This model can be used when returning data from the database
+
+# --- Database Model ---
 class ProductInDB(ProductModel):
     pass
 
-# Model for creating a new product (ID is not required)
+
+# --- Models for CRUD Operations ---
 class ProductCreateModel(BaseModel):
     name: str = Field(...)
     price: float = Field(..., gt=0)
@@ -60,7 +64,6 @@ class ProductCreateModel(BaseModel):
     sizes: List[str] = Field(...)
 
 
-# Model for updating a product (all fields are optional)
 class ProductUpdateModel(BaseModel):
     name: Optional[str] = None
     price: Optional[float] = Field(default=None, gt=0)
