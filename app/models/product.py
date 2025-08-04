@@ -1,30 +1,27 @@
 # backend/app/models/product.py
 from pydantic import BaseModel, Field
-from typing import List, Any, Optional
+from typing import List, Optional
 from bson import ObjectId
-from pydantic_core.core_schema import CoreSchema
 
 
-# --- Custom Pydantic Type for MongoDB's ObjectId (Pydantic v2 compatible) ---
+# --- THIS IS THE Pydantic v1 COMPATIBLE PyObjectId CLASS ---
 class PyObjectId(ObjectId):
     @classmethod
-    def __get_pydantic_core_schema__(cls, source_type: Any, handler: Any) -> CoreSchema:
-        def validate_from_str(value: str) -> ObjectId:
-            if not ObjectId.is_valid(value):
-                raise ValueError("Invalid ObjectId")
-            return ObjectId(value)
+    def __get_validators__(cls):
+        yield cls.validate
 
-        return CoreSchema(
-            "union",
-            [
-                CoreSchema("is-instance", ObjectId),
-                CoreSchema("no-info-plain-validator", validate_from_str),
-            ],
-            serialization={"type": "to-string"},
-        )
+    @classmethod
+    def validate(cls, v):
+        if not ObjectId.is_valid(v):
+            raise ValueError("Invalid ObjectId")
+        return ObjectId(v)
+
+    @classmethod
+    def __modify_schema__(cls, field_schema):
+        field_schema.update(type="string")
 
 
-# --- Pydantic Model for a Product ---
+# --- Pydantic Model for a Product (with v1 Config) ---
 class ProductModel(BaseModel):
     id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
     name: str = Field(...)
@@ -35,9 +32,11 @@ class ProductModel(BaseModel):
     sizes: List[str] = Field(...)
 
     class Config:
-        populate_by_name = True
+        # Use the Pydantic v1 config keys
+        allow_population_by_field_name = True
+        arbitrary_types_allowed = True  # This is key for custom types in v1
         json_encoders = {ObjectId: str}
-        json_schema_extra = {
+        schema_extra = {
             "example": {
                 "name": "Summer Dress",
                 "price": 49.99,
