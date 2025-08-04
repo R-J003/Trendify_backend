@@ -14,7 +14,7 @@ def get_product_collection():
     return db.products
 
 @router.get(
-    "/",
+    "",
     response_description="List all products",
     response_model=List[ProductInDB],
     status_code=status.HTTP_200_OK
